@@ -5,6 +5,14 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from PyPDF2 import PdfReader
 
+# ================================
+# 🎯 Page Config
+# ================================
+st.set_page_config(
+    page_title="RAG PDF QA",
+    page_icon="🤖",
+    layout="wide"
+)
 
 # ================================
 # 📄 PDF Loader
@@ -59,7 +67,7 @@ def retrieve(query, k=5):
 # 🤖 RAG Pipeline
 # ================================
 def rag_pipeline(query):
-    context_chunks = retrieve(query, k=5)
+    context_chunks = retrieve(query, k=k)
 
     context = " ".join(context_chunks[:3])
     context = re.sub(r"\s+", " ", context)
@@ -94,38 +102,84 @@ Answer:
 
 
 # ================================
-# 🚀 STREAMLIT UI
+# 🎨 UI STARTS HERE
 # ================================
-st.title("📄 PDF Question Answering (RAG)")
 
-uploaded_file = st.file_uploader("Upload your PDF", type="pdf")
+st.title("📄 RAG-based PDF Question Answering")
+
+st.markdown("""
+Upload a PDF and ask questions.  
+The system retrieves relevant content and generates accurate answers.
+""")
+
+# ================================
+# ⚙️ Sidebar
+# ================================
+with st.sidebar:
+    st.header("⚙️ Settings")
+
+    k = st.slider("Top K Chunks", 1, 10, 5)
+
+    st.markdown("---")
+    st.info("Built using RAG + FAISS + Transformers")
+
+
+# ================================
+# 📂 Upload PDF
+# ================================
+uploaded_file = st.file_uploader("📂 Upload your PDF", type=["pdf"])
+
 
 if uploaded_file:
-    st.success("PDF uploaded successfully!")
+    st.success("✅ PDF uploaded successfully!")
 
-    # Process PDF
-    pdf_text = load_pdf(uploaded_file)
-    pdf_text = clean_text(pdf_text)
-    documents = chunk_text(pdf_text)
+    with st.spinner("Processing PDF..."):
+        pdf_text = load_pdf(uploaded_file)
+        pdf_text = clean_text(pdf_text)
+        documents = chunk_text(pdf_text)
 
-    st.write(f"📊 Total Chunks: {len(documents)}")
+        st.write(f"📊 Total Chunks: {len(documents)}")
 
-    # Load models
-    embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    doc_embeddings = embedder.encode(documents, convert_to_numpy=True)
+        # Embeddings
+        embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        doc_embeddings = embedder.encode(documents, convert_to_numpy=True)
 
-    dimension = doc_embeddings.shape[1]
-    index = faiss.IndexFlatL2(dimension)
-    index.add(doc_embeddings)
+        dimension = doc_embeddings.shape[1]
+        index = faiss.IndexFlatL2(dimension)
+        index.add(doc_embeddings)
 
-    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
-    model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
+        # Model
+        tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+        model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
 
-    # Query input
-    query = st.text_input("Ask a question from the PDF:")
+    # ================================
+    # ❓ Question Input
+    # ================================
+    query = st.text_input("❓ Ask a question from the PDF")
 
     if query:
-        answer = rag_pipeline(query)
+        with st.spinner("Generating answer..."):
+            answer = rag_pipeline(query)
 
-        st.subheader("📌 Answer:")
-        st.write(answer)
+        # ================================
+        # 🤖 Answer Display
+        # ================================
+        st.markdown("### 🤖 Answer")
+        st.success(answer)
+
+        # ================================
+        # 🔍 Context Viewer (IMPRESSIVE 🔥)
+        # ================================
+        with st.expander("🔍 See Retrieved Context"):
+            chunks = retrieve(query, k=3)
+            for i, chunk in enumerate(chunks):
+                st.write(f"Chunk {i+1}:")
+                st.write(chunk)
+                st.markdown("---")
+
+
+# ================================
+# Footer
+# ================================
+st.markdown("---")
+st.caption("🚀 Built by Chanchal | RAG Project")
