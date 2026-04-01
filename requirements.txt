@@ -1,8 +1,7 @@
 
 streamlit
 PyPDF2
-sentence-transformers==2.2.2
-transformers==4.36.2
-torch==2.9.1
-faiss-cpu==1.7.4
-numpy
+sentence-transformers
+transformers
+faiss-cpu
+torch>=2.9.0
