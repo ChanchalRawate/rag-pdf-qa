@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # ================================
-# 📄 PDF Loader
+# PDF Loader
 # ================================
 def load_pdf(file):
     reader = PdfReader(file)
@@ -39,7 +39,7 @@ def clean_text(text):
 
 
 # ================================
-# ✂️ Chunking
+#  Chunking
 # ================================
 def chunk_text(text, chunk_size=120, overlap=30):
     words = text.split()
@@ -55,7 +55,7 @@ def chunk_text(text, chunk_size=120, overlap=30):
 
 
 # ================================
-# 🔍 Retrieval
+#  Retrieval
 # ================================
 def retrieve(query, k=5):
     query_vector = embedder.encode([query], convert_to_numpy=True)
@@ -64,7 +64,7 @@ def retrieve(query, k=5):
 
 
 # ================================
-# 🤖 RAG Pipeline
+#  RAG Pipeline
 # ================================
 def rag_pipeline(query):
     context_chunks = retrieve(query, k=k)
@@ -102,7 +102,7 @@ Answer:
 
 
 # ================================
-# 🎨 UI STARTS HERE
+# UI STARTS HERE
 # ================================
 
 st.title("📄 RAG-based PDF Question Answering")
@@ -125,7 +125,7 @@ with st.sidebar:
 
 
 # ================================
-# 📂 Upload PDF
+#  Upload PDF
 # ================================
 uploaded_file = st.file_uploader("📂 Upload your PDF", type=["pdf"])
 
@@ -153,7 +153,7 @@ if uploaded_file:
         model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
 
     # ================================
-    # ❓ Question Input
+    #  Question Input
     # ================================
     query = st.text_input("❓ Ask a question from the PDF")
 
@@ -162,13 +162,13 @@ if uploaded_file:
             answer = rag_pipeline(query)
 
         # ================================
-        # 🤖 Answer Display
+        #  Answer Display
         # ================================
         st.markdown("### 🤖 Answer")
         st.success(answer)
 
         # ================================
-        # 🔍 Context Viewer (IMPRESSIVE 🔥)
+        #  Context Viewer (IMPRESSIVE 🔥)
         # ================================
         with st.expander("🔍 See Retrieved Context"):
             chunks = retrieve(query, k=3)
