@@ -1,73 +1,92 @@
-import numpy as np
+import streamlit as st
+import re
 import faiss
 from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from PyPDF2 import PdfReader
 
 # ================================
-# Load Models
+#  Page Config
 # ================================
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
-
-tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
-model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
-
-
-# ================================
-# Build Index (Cosine Similarity)
-# ================================
-def build_index(documents):
-    embeddings = embedder.encode(documents, convert_to_numpy=True)
-
-    # Normalize for cosine similarity
-    faiss.normalize_L2(embeddings)
-
-    dimension = embeddings.shape[1]
-    index = faiss.IndexFlatIP(dimension)  # inner product = cosine after normalization
-    index.add(embeddings)
-
-    return index, embeddings
-
+st.set_page_config(
+    page_title="RAG PDF QA",
+    page_icon="🤖",
+    layout="wide"
+)
 
 # ================================
-# Retrieve (Top-K)
+# 📄 PDF Loader
+# ================================
+def load_pdf(file):
+    reader = PdfReader(file)
+    text = ""
+
+    for page in reader.pages:
+        extracted = page.extract_text()
+        if extracted:
+            text += extracted + "\n"
+
+    return text
+
+
+# ================================
+# 🧹 Clean Text
+# ================================
+def clean_text(text):
+    text = text.replace("\n", " ")
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+# ================================
+# ✂️ Chunking
+# ================================
+def chunk_text(text, chunk_size=120, overlap=30):
+    words = text.split()
+    chunks = []
+    step = chunk_size - overlap
+
+    for i in range(0, len(words), step):
+        chunk = " ".join(words[i:i+chunk_size])
+        if len(chunk.split()) > 30:
+            chunks.append(chunk.strip())
+
+    return chunks
+
+
+# ================================
+# 🔍 Retrieval
 # ================================
 def retrieve(query, index, documents, k=5):
     query_vec = embedder.encode([query], convert_to_numpy=True)
     faiss.normalize_L2(query_vec)
 
     scores, indices = index.search(query_vec, k)
-
-    results = [(documents[i], scores[0][idx]) for idx, i in enumerate(indices[0])]
-    return results
-
+    return [(documents[i], scores[0][idx]) for idx, i in enumerate(indices[0])]
 
 # ================================
-# Optional: Re-ranking (lightweight)
+# Re-ranking
 # ================================
-def rerank(query, retrieved_chunks):
-    # Simple score-based re-ranking (can replace with cross-encoder later)
+def rerank(retrieved_chunks):
     return sorted(retrieved_chunks, key=lambda x: x[1], reverse=True)
-
-
 # ================================
 # RAG Pipeline
 # ================================
 def rag_pipeline(query, index, documents, top_k=5, final_k=3):
-    
+
     # Step 1: Retrieve
     retrieved = retrieve(query, index, documents, k=top_k)
 
     # Step 2: Re-rank
-    reranked = rerank(query, retrieved)
+    reranked = rerank(retrieved)
 
-    # Step 3: Select top chunks
+    # Step 3: Select context
     selected_chunks = [chunk for chunk, _ in reranked[:final_k]]
     context = " ".join(selected_chunks)
+    context = re.sub(r"\s+", " ", context)
 
-    # Step 4: Prompt (Improved)
+    # Step 4: Prompt
     prompt = f"""
-You are a QA assistant.
-
 Answer ONLY from the given context.
 If the answer is not present, say "Not found in document."
 
@@ -91,3 +110,91 @@ Answer:
     answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     return answer.strip(), selected_chunks
+
+
+# ================================
+#  UI STARTS HERE
+# ================================
+
+st.title("📄 RAG-based PDF Question Answering")
+
+st.markdown("""
+Upload a PDF and ask questions.  
+The system retrieves relevant content and generates accurate answers.
+""")
+
+# ================================
+# ⚙️ Sidebar
+# ================================
+with st.sidebar:
+    st.header("⚙️ Settings")
+
+    k = st.slider("Top K Chunks", 1, 10, 5)
+
+    st.markdown("---")
+    st.info("Built using RAG + FAISS + Transformers")
+
+
+# ================================
+# 📂 Upload PDF
+# ================================
+uploaded_file = st.file_uploader("📂 Upload your PDF", type=["pdf"])
+
+if uploaded_file:
+    st.success("✅ PDF uploaded successfully!")
+
+    with st.spinner("Processing PDF..."):
+        pdf_text = load_pdf(uploaded_file)
+        pdf_text = clean_text(pdf_text)
+        documents = chunk_text(pdf_text)
+
+        st.write(f"📊 Total Chunks: {len(documents)}")
+
+        # ================================
+        # Embeddings + Index (Cosine Similarity)
+        # ================================
+        embedder = SentenceTransformer("all-MiniLM-L6-v2")
+
+        doc_embeddings = embedder.encode(documents, convert_to_numpy=True)
+        faiss.normalize_L2(doc_embeddings)
+
+        dimension = doc_embeddings.shape[1]
+        index = faiss.IndexFlatIP(dimension)
+        index.add(doc_embeddings)
+
+        # ================================
+        # Model
+        # ================================
+        tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+        model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
+
+    # ================================
+    # ❓ Question Input
+    # ================================
+    query = st.text_input("❓ Ask a question from the PDF")
+
+    if query:
+        with st.spinner("Generating answer..."):
+            answer, chunks = rag_pipeline(query, index, documents, top_k=k)
+
+        # ================================
+        # 🤖 Answer Display
+        # ================================
+        st.markdown("### 🤖 Answer")
+        st.success(answer)
+
+        # ================================
+        # 🔍 Context Viewer
+        # ================================
+        with st.expander("🔍 See Retrieved Context"):
+            for i, chunk in enumerate(chunks):
+                st.write(f"Chunk {i+1}:")
+                st.write(chunk)
+                st.markdown("---")
+
+
+# ================================
+# Footer
+# ================================
+st.markdown("---")
+st.caption("Built by Chanchal | RAG Project")
