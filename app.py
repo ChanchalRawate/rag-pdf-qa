@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # ================================
-# 📄 PDF Loader
+#  PDF Loader
 # ================================
 def load_pdf(file):
     reader = PdfReader(file)
@@ -30,7 +30,7 @@ def load_pdf(file):
 
 
 # ================================
-# 🧹 Clean Text
+#  Clean Text
 # ================================
 def clean_text(text):
     text = text.replace("\n", " ")
@@ -39,23 +39,27 @@ def clean_text(text):
 
 
 # ================================
-# ✂️ Chunking
+#  Chunking
 # ================================
-def chunk_text(text, chunk_size=120, overlap=30):
-    words = text.split()
+tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+def chunk_text(text, max_tokens=256, overlap=50):
+    tokens = tokenizer.encode(text)
     chunks = []
-    step = chunk_size - overlap
 
-    for i in range(0, len(words), step):
-        chunk = " ".join(words[i:i+chunk_size])
-        if len(chunk.split()) > 30:
+    step = max_tokens - overlap
+
+    for i in range(0, len(tokens), step):
+        chunk_tokens = tokens[i:i+max_tokens]
+        chunk = tokenizer.decode(chunk_tokens)
+        chunks.append(chunk.strip())
+         if len(chunk.strip()) > 20:
             chunks.append(chunk.strip())
-
+             
     return chunks
 
 
 # ================================
-# 🔍 Retrieval
+# Retrieval
 # ================================
 def retrieve(query, index, documents, k=5):
     query_vec = embedder.encode([query], convert_to_numpy=True)
@@ -165,7 +169,7 @@ if uploaded_file:
         # ================================
         # Model
         # ================================
-        tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+       
         model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
 
     # ================================
