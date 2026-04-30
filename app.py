@@ -51,7 +51,7 @@ def chunk_text(text, max_tokens=256, overlap=50):
     for i in range(0, len(tokens), step):
         chunk_tokens = tokens[i:i+max_tokens]
         chunk = tokenizer.decode(chunk_tokens)
-        chunks.append(chunk.strip())
+       
          if len(chunk.strip()) > 20:
             chunks.append(chunk.strip())
              
