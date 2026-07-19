@@ -33,3 +33,6 @@ backend/uploads/
 
 # OS
 .DS_Store
+
+backend/python/uploads/*
+!backend/python/uploads/.gitkeep

@@ -26,7 +26,7 @@ function ChatBox({ messages, setMessages }) {
       console.log("Sending question:", userQuestion);
 
       // Send question to Node.js backend
-      const response = await axios.post("http://localhost:5000/query", {
+      const response = await axios.post("http://localhost:8000/query", {
         question: userQuestion,
       });
 

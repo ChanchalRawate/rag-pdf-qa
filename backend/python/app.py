@@ -1,51 +1,79 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
 
 from rag import process_pdf, ask_question
 
 app = FastAPI()
 
+# -----------------------------------
+# Enable CORS
+# -----------------------------------
 
-# -----------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change this to your Vercel URL after deployment
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# -----------------------------------
+# Upload Folder
+# -----------------------------------
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# -----------------------------------
 # Request Models
-# -----------------------------
-class PDFRequest(BaseModel):
-    path: str
-
+# -----------------------------------
 
 class QueryRequest(BaseModel):
     question: str
 
-
-# -----------------------------
+# -----------------------------------
 # Routes
-# -----------------------------
+# -----------------------------------
+
 @app.get("/")
 def home():
     return {
         "message": "Python RAG API Running"
     }
 
+# -----------------------------------
+# Upload PDF
+# -----------------------------------
 
-@app.post("/process-pdf")
-def process_uploaded_pdf(request: PDFRequest):
+@app.post("/upload-pdf")
+async def upload_pdf(pdf: UploadFile = File(...)):
     try:
-        chunks = process_pdf(request.path)
+        file_path = os.path.join(UPLOAD_DIR, pdf.filename)
+
+        with open(file_path, "wb") as f:
+            f.write(await pdf.read())
+
+        chunks = process_pdf(file_path)
 
         return {
             "success": True,
-            "message": "PDF processed successfully",
-            "chunks": chunks
+            "message": "PDF uploaded successfully.",
+            "chunks": chunks,
         }
 
     except Exception as e:
-        print("PDF Processing Error:", e)
+        print("Upload Error:", e)
 
         return {
             "success": False,
-            "error": str(e)
+            "error": str(e),
         }
 
+# -----------------------------------
+# Ask Question
+# -----------------------------------
 
 @app.post("/query")
 def query_pdf(request: QueryRequest):
@@ -54,7 +82,7 @@ def query_pdf(request: QueryRequest):
 
         return {
             "success": True,
-            "answer": answer
+            "answer": answer,
         }
 
     except Exception as e:
@@ -62,5 +90,5 @@ def query_pdf(request: QueryRequest):
 
         return {
             "success": False,
-            "error": str(e)
+            "error": str(e),
         }
