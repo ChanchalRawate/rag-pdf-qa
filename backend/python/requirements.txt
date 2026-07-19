@@ -6,4 +6,5 @@ sentence-transformers
 transformers
 torch
 numpy
+groq
 python-multipart
