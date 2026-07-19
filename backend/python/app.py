@@ -1,3 +1,15 @@
+print(">>> app.py started")
+
+from rag import process_pdf, ask_question
+
+print(">>> rag imported")
+
+app = FastAPI()
+
+print(">>> FastAPI created")
+
+
+
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
