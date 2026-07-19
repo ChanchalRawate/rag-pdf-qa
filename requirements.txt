@@ -1,7 +1,0 @@
-
-streamlit
-PyPDF2
-sentence-transformers
-transformers
-faiss-cpu
-torch>=2.9.0
