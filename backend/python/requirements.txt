@@ -10,3 +10,4 @@ groq
 python-multipart
 python-dotenv
 huggingface-hub
+langchain-text-splitters
