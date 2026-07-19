@@ -1,16 +1,105 @@
-# React + Vite
+# 📄 RAG PDF Question Answering System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An AI-powered PDF Question Answering application that allows users to upload a PDF and ask questions in natural language. The system retrieves relevant content using FAISS and generates context-aware answers using a local LLM (Qwen2.5:3B via Ollama).
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Upload PDF documents
+- Ask questions about uploaded PDFs
+- Retrieval-Augmented Generation (RAG)
+- FAISS Vector Search
+- Local LLM using Ollama (Qwen2.5:3B)
+- React Frontend
+- Node.js Backend
+- FastAPI for AI processing
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Frontend
+- React
+- Vite
 
-## Expanding the ESLint configuration
+### Backend
+- Node.js
+- Express.js
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### AI Backend
+- FastAPI
+- FAISS
+- Sentence Transformers
+- Ollama
+- Qwen2.5:3B
+
+## 📂 Project Structure
+
+```
+pdf-chat-app/
+│
+├── frontend/
+├── backend/
+│   ├── server.js
+│   └── python/
+└── README.md
+```
+
+## ⚙️ Installation
+
+### Clone Repository
+
+```bash
+git clone https://github.com/ChanchalRawate/rag-pdf-qa.git
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend
+
+```bash
+cd backend
+npm install
+node server.js
+```
+
+### FastAPI
+
+```bash
+cd backend/python
+
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+uvicorn app:app --reload
+```
+
+### Ollama
+
+Install Ollama and download the model:
+
+```bash
+ollama pull qwen2.5:3b
+ollama serve
+```
+
+## 📌 Workflow
+
+1. Upload a PDF
+2. Extract text
+3. Chunk the document
+4. Generate embeddings
+5. Store embeddings in FAISS
+6. Retrieve relevant chunks
+7. Generate answers using Qwen2.5:3B
+
+## 👩‍💻 Author
+
+**Chanchal Rawate**
