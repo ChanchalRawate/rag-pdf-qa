@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL;
+const API = "http://localhost:8080";
 
 function FileUpload({ file, setFile }) {
   const handleFileChange = (event) => {
