@@ -1,6 +1,6 @@
 
 ````
-# RAG-Based PDF Question Answering System
+ RAG-Based PDF Question Answering System
 
 An AI-powered full-stack application that allows users to upload PDF documents and ask natural-language questions about their content.
 
@@ -8,7 +8,7 @@ The application uses a Retrieval-Augmented Generation (RAG) pipeline to retrieve
 
 ---
 
-##  Features
+  Features
 
 - Upload PDF documents through a React interface
 - Extract and preprocess PDF text
@@ -25,7 +25,7 @@ The application uses a Retrieval-Augmented Generation (RAG) pipeline to retrieve
 
 ---
 
-##  System Architecture
+  System Architecture
 
 ```text
                     ┌─────────────────────┐
