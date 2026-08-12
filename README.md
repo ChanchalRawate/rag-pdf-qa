@@ -1,19 +1,125 @@
-# 📄 RAG PDF Question Answering System
 
-An AI-powered Retrieval-Augmented Generation (RAG) application that allows users to upload PDF documents and ask questions in natural language. The system retrieves relevant content using FAISS vector search and generates context-aware answers using the Groq API.
+````
+# RAG-Based PDF Question Answering System
+
+An AI-powered full-stack application that allows users to upload PDF documents and ask natural-language questions about their content.
+
+The application uses a Retrieval-Augmented Generation (RAG) pipeline to retrieve relevant information from the uploaded document and generate context-aware answers using an LLM.
 
 ---
 
-## 🚀 Features
+##  Features
 
-- 📄 Upload PDF documents
-- 💬 Ask questions about uploaded PDFs
-- 🔍 Retrieval-Augmented Generation (RAG)
-- 📚 Semantic Search using FAISS
-- 🤖 Answer generation using Groq API
-- ⚡ FastAPI Backend
-- ⚛️ React Frontend
-- 🧠 Sentence Transformer Embeddings
+- Upload PDF documents through a React interface
+- Extract and preprocess PDF text
+- Split documents into smaller chunks
+- Generate semantic embeddings using Sentence Transformers
+- Store and search embeddings using FAISS
+- Retrieve the most relevant document chunks for a question
+- Generate context-aware answers using Groq LLM
+- RESTful API architecture
+- Spring Boot gateway between frontend and AI service
+- FastAPI-based AI/RAG service
+- Real-time question answering
+- CORS-enabled frontend-backend communication
+
+---
+
+##  System Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │    React Frontend   │
+                    │                     │
+                    │ PDF Upload + Chat   │
+                    └──────────┬──────────┘
+                               │
+                               │ HTTP Request
+                               ▼
+                    ┌─────────────────────┐
+                    │   Spring Boot       │
+                    │      Backend        │
+                    │                     │
+                    │ REST API Gateway    │
+                    └──────────┬──────────┘
+                               │
+                               │ HTTP Request
+                               ▼
+                    ┌─────────────────────┐
+                    │      FastAPI        │
+                    │     AI Service      │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │     RAG Pipeline    │
+                    │                     │
+                    │ PDF Extraction      │
+                    │ Text Cleaning       │
+                    │ Text Chunking       │
+                    │ Embeddings          │
+                    │ FAISS Retrieval     │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │      Groq LLM       │
+                    │                     │
+                    │ Answer Generation   │
+                    └─────────────────────┘
+````
+
+---
+
+##  RAG Pipeline
+
+The application follows these steps:
+
+### 1. PDF Upload
+
+The user uploads a PDF through the React frontend.
+
+```text
+React
+  ↓
+POST /upload-pdf
+  ↓
+Spring Boot
+  ↓
+FastAPI
+```
+
+### 2. PDF Processing
+
+FastAPI extracts the text from the uploaded PDF and cleans the extracted content.
+
+### 3. Text Chunking
+
+The document is divided into smaller chunks to make semantic retrieval more effective.
+
+### 4. Embedding Generation
+
+Each text chunk is converted into a vector representation using:
+
+```text
+BAAI/bge-small-en-v1.5
+```
+
+### 5. FAISS Vector Store
+
+The generated embeddings are stored in a FAISS index.
+
+When a user asks a question, the question is also converted into an embedding and compared against the stored vectors.
+
+### 6. Similarity Search
+
+The top relevant chunks are retrieved from FAISS.
+
+### 7. LLM Generation
+
+The retrieved chunks are passed as context to the Groq LLM.
+
+The model generates an answer using only the retrieved PDF context.
 
 ---
 
@@ -21,300 +127,338 @@ An AI-powered Retrieval-Augmented Generation (RAG) application that allows users
 
 ### Frontend
 
-- React
-- Vite
-- Axios
+* React.js
+* Axios
+* HTML/CSS
 
 ### Backend
 
-- FastAPI
-- Python
+* Java
+* Spring Boot
+* Spring Web
+* RestClient
 
-### AI & Machine Learning
+### AI Service
 
-- Groq API
-- Sentence Transformers
-- FAISS
-- PyPDF2
-- Hugging Face Embedding Model
+* Python
+* FastAPI
+* Sentence Transformers
+* FAISS
+* Groq API
+
+### Machine Learning / NLP
+
+* BAAI/bge-small-en-v1.5
+* Semantic embeddings
+* Vector similarity search
+* Retrieval-Augmented Generation (RAG)
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
-```
+```text
 pdf-chat-app/
 │
 ├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ChatBox.jsx
+│   │   │   └── FileUpload.jsx
+│   │   └── ...
+│   └── package.json
 │
 ├── backend/
-│   └── python/
-│       ├── app.py
-│       ├── rag.py
-│       ├── llm.py
-│       ├── vector_store.py
-│       ├── model.py
-│       ├── utils.py
-│       └── requirements.txt
+│   │
+│   ├── python/
+│   │   ├── app.py
+│   │   ├── rag.py
+│   │   ├── utils.py
+│   │   ├── vector_store.py
+│   │   ├── llm.py
+│   │   └── requirements.txt
+│   │
+│   └── spring-backend/
+│       ├── src/
+│       │   └── main/
+│       │       ├── java/
+│       │       │   └── com/chanchal/rag_backend/
+│       │       │       ├── client/
+│       │       │       ├── config/
+│       │       │       ├── controller/
+│       │       │       ├── dto/
+│       │       │       └── service/
+│       │       └── resources/
+│       │           └── application.properties
+│       │
+│       ├── pom.xml
+│       └── mvnw
 │
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-## ⚙️ Installation
+## 🔌 API Endpoints
 
-### 1. Clone Repository
+### Spring Boot Backend
+
+#### Health Check
+
+```http
+GET /
+```
+
+Response:
+
+```text
+Spring Boot Backend Running!
+```
+
+#### Upload PDF
+
+```http
+POST /upload-pdf
+```
+
+Request:
+
+```text
+multipart/form-data
+pdf=<PDF file>
+```
+
+#### Ask Question
+
+```http
+POST /query
+```
+
+Request:
+
+```json
+{
+  "question": "What is regularization?"
+}
+```
+
+---
+
+## ⚙️ Local Setup
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/ChanchalRawate/rag-pdf-qa.git
-
 cd rag-pdf-qa
 ```
 
 ---
 
-### 2. Frontend
+### 2. Start FastAPI
+
+Navigate to:
 
 ```bash
+cd backend/python
+```
+
+Create and activate the virtual environment:
+
+### Windows
+
+```powershell
+python -m venv venv
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+Create a `.env` file:
+
+```env
+GROQ_API_KEY=your_groq_api_key
+```
+
+Start FastAPI:
+
+```powershell
+uvicorn app:app --reload
+```
+
+FastAPI will run on:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+### 3. Start Spring Boot
+
+Open another terminal:
+
+```powershell
+cd backend/spring-backend
+```
+
+Run:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+Spring Boot will run on:
+
+```text
+http://localhost:8080
+```
+
+---
+
+### 4. Start React
+
+Open another terminal:
+
+```powershell
 cd frontend
+```
 
+Install dependencies:
+
+```powershell
 npm install
+```
 
+Start the frontend:
+
+```powershell
 npm run dev
 ```
 
 ---
 
-### 3. Backend
+##  Environment Variables
 
-```bash
-cd backend/python
+The Groq API key is stored locally in:
 
-python -m venv venv
+```text
+backend/python/.env
 ```
 
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Environment Variables
-
-Create a `.env` file inside `backend/python`.
+Example:
 
 ```env
-GROQ_API_KEY=YOUR_GROQ_API_KEY
+GROQ_API_KEY=your_api_key
 ```
 
-### Run FastAPI
+The `.env` file is intentionally excluded from Git using `.gitignore`.
 
-```bash
-uvicorn app:app --reload
+**Never commit API keys or other secrets to GitHub.**
+
+---
+
+##  Request Flow
+
+### PDF Upload
+
+```text
+User
+ ↓
+React FileUpload
+ ↓
+Spring Boot /upload-pdf
+ ↓
+FastAPI /upload-pdf
+ ↓
+PDF Extraction
+ ↓
+Text Chunking
+ ↓
+Embeddings
+ ↓
+FAISS Index
+```
+
+### Question Answering
+
+```text
+User Question
+ ↓
+React ChatBox
+ ↓
+Spring Boot /query
+ ↓
+FastAPI /query
+ ↓
+Question Embedding
+ ↓
+FAISS Similarity Search
+ ↓
+Top-K Relevant Chunks
+ ↓
+Groq LLM
+ ↓
+Generated Answer
+ ↓
+React UI
 ```
 
 ---
 
-## 📌 Workflow
+##  Example
 
-1. Upload a PDF
-2. Extract text from the PDF
-3. Clean and preprocess text
-4. Split text into chunks
-5. Generate embeddings using Sentence Transformers
-6. Store embeddings in FAISS
-7. Retrieve the most relevant chunks
-8. Send retrieved context to Groq API
-9. Generate the final answer
+Question:
+
+```text
+What is regularization, and how do L1 and L2 differ?
+```
+
+The system retrieves the most relevant chunks from the uploaded PDF and passes them to the LLM as context.
+
+The model generates an answer based only on the retrieved document content.
 
 ---
 
-# 🚀 Project Evolution
+## 🎯 Project Highlights
 
-### Version 1 — Hugging Face Local LLM
-
-Initially the project used the local Hugging Face model:
-
-```
-Qwen/Qwen2.5-0.5B-Instruct
-```
-
-**Challenges**
-
-- Large model download
-- Slow installation
-- High memory usage
-- Difficult deployment
-
-**Decision**
-
-Migrated to Ollama for faster local inference.
+* Implemented a complete Retrieval-Augmented Generation pipeline
+* Integrated React, Spring Boot, and FastAPI into a microservices-style architecture
+* Implemented semantic search using Sentence Transformer embeddings and FAISS
+* Integrated Groq LLM for context-aware answer generation
+* Designed Spring Boot as an API gateway between the frontend and AI service
+* Implemented multipart PDF upload and REST API communication
+* Added environment-based API key management
 
 ---
 
-### Version 2 — Ollama
+## 🔮 Future Improvements
 
-Local model used:
-
-```
-qwen2.5:3b
-```
-
-**Advantages**
-
-- Fast local inference
-- Better response quality
-- No API cost
-
-**Challenges**
-
-- Required local Ollama runtime
-- Public deployment required cloud GPU
-- Cloud GPU providers required payment information
-
-**Decision**
-
-Migrated to Google Gemini API.
+* Persistent vector database instead of in-memory FAISS storage
+* Support for multiple PDFs
+* User authentication
+* Conversation history
+* Streaming LLM responses
+* Improved chunking and retrieval strategies
+* Cloud deployment
+* Docker containerization
 
 ---
-
-### Version 3 — Google Gemini API
-
-The local LLM was replaced with the Gemini API.
-
-**Advantages**
-
-- Lightweight backend
-- No local model download
-- Easy API integration
-
-**Challenges**
-
-- Model deprecation
-- API quota limitations
-
-**Decision**
-
-Migrated to Groq API.
-
----
-
-### Version 4 — Groq API (Current)
-
-The application now uses the Groq API for answer generation.
-
-**Advantages**
-
-- Very fast inference
-- Lightweight architecture
-- Easy deployment
-- Production-friendly API
-
----
-
-## 🏗️ Architecture Evolution
-
-### Previous Architecture
-
-```
-React
-   │
-Node.js (Express)
-   │
-FastAPI
-   │
-FAISS
-   │
-Ollama
-```
-
-### Current Architecture
-
-```
-React
-   │
-FastAPI
-   │
-PDF Processing
-   │
-Sentence Transformers
-   │
-FAISS
-   │
-Groq API
-```
-
----
-
-## ⚠️ Deployment Note
-
-The project runs successfully in the local environment.
-
-Deployment on the Render Free Tier was attempted, but the application exceeded the available 512 MB memory because the embedding model relies on PyTorch and Sentence Transformers during startup.
-
-Future improvements include using a lightweight embedding API or deploying on a higher-memory instance.
-
----
-
-## ⚠️ Challenges Faced
-
-During the development of this project, several technical challenges were encountered and resolved:
-
-### 1. Hugging Face Local Model
-
-- Large model downloads increased setup time.
-- High memory consumption made deployment difficult.
-
-### 2. Ollama Integration
-
-- Achieved fast local inference.
-- However, Ollama requires a local runtime and is not suitable for free cloud deployment.
-
-### 3. Gemini API Migration
-
-- Replaced the local LLM with the Gemini API.
-- Faced model compatibility and API quota limitations.
-
-### 4. Groq API Migration
-
-- Migrated to the Groq API for faster inference and simpler integration.
-- Reduced backend complexity by removing local LLM dependencies.
-
-### 5. Backend Simplification
-
-- Initially used both Express.js and FastAPI.
-- Removed the Express backend and migrated to a single FastAPI backend to simplify the architecture and reduce unnecessary API calls.
-
-### 6. Deployment Challenges
-
-- Successfully ran the application in the local environment.
-- Deployment on Render Free Tier failed because the embedding model (Sentence Transformers + PyTorch) exceeded the available 512 MB memory limit.
-- Identified that a lightweight embedding service or a higher-memory deployment environment would be required for cloud deployment.
-  
----
-
-## 🚀 Future Improvements
-
-The following enhancements are planned for future versions of the project:
-
-- Deploy the complete application to the cloud using a lightweight embedding service or a higher-memory hosting platform.
-- Replace the local embedding model with an embedding API to reduce memory usage and improve deployment compatibility.
-- Support multiple PDF uploads and create a searchable document library.
-- Store embeddings in a persistent vector database (such as ChromaDB, Pinecone, or Weaviate) instead of rebuilding the FAISS index after every upload.
-- Add conversation history to enable context-aware multi-turn question answering.
-- Improve retrieval quality using hybrid search and reranking techniques.
-- Support additional document formats such as DOCX and TXT.
-- Implement user authentication and personal document management.
-- Add source citations by highlighting the exact PDF sections used to generate each answer.
-- Containerize the application with Docker and automate deployment using CI/CD pipelines.
 
 ## 👩‍💻 Author
 
 **Chanchal Rawate**
+
+GitHub:
+[https://github.com/ChanchalRawate](https://github.com/ChanchalRawate)
+
+````
+
+
+
+
