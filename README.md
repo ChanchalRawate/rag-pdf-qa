@@ -425,7 +425,7 @@ The model generates an answer based only on the retrieved document content.
 
 ---
 
-## 🎯 Project Highlights
+## Project Highlights
 
 * Implemented a complete Retrieval-Augmented Generation pipeline
 * Integrated React, Spring Boot, and FastAPI into a microservices-style architecture
@@ -437,7 +437,7 @@ The model generates an answer based only on the retrieved document content.
 
 ---
 
-## 🔮 Future Improvements
+##  Future Improvements
 
 * Persistent vector database instead of in-memory FAISS storage
 * Support for multiple PDFs
@@ -457,7 +457,7 @@ The model generates an answer based only on the retrieved document content.
 GitHub:
 [https://github.com/ChanchalRawate](https://github.com/ChanchalRawate)
 
-````
+
 
 
 
