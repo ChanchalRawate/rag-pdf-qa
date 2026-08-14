@@ -1,83 +1,93 @@
+# 📄 PDF AI Assistant — RAG-Based Question Answering System
 
-````
- RAG-Based PDF Question Answering System
+An AI-powered PDF Question Answering application that allows users to upload PDF documents and ask questions in natural language.
 
-An AI-powered full-stack application that allows users to upload PDF documents and ask natural-language questions about their content.
+The application uses **Retrieval-Augmented Generation (RAG)** to retrieve relevant information from uploaded documents and generate context-aware answers.
 
-The application uses a Retrieval-Augmented Generation (RAG) pipeline to retrieve relevant information from the uploaded document and generate context-aware answers using an LLM.
+The project follows a three-layer architecture:
 
----
-
-  Features
-
-- Upload PDF documents through a React interface
-- Extract and preprocess PDF text
-- Split documents into smaller chunks
-- Generate semantic embeddings using Sentence Transformers
-- Store and search embeddings using FAISS
-- Retrieve the most relevant document chunks for a question
-- Generate context-aware answers using Groq LLM
-- RESTful API architecture
-- Spring Boot gateway between frontend and AI service
-- FastAPI-based AI/RAG service
-- Real-time question answering
-- CORS-enabled frontend-backend communication
+* **React + Vite** — Frontend
+* **Spring Boot** — Backend API Gateway & Authentication
+* **FastAPI + Python** — PDF processing and RAG pipeline
 
 ---
 
-  System Architecture
+## ✨ Features
+
+* 📄 Upload PDF documents
+* 🤖 Ask natural-language questions about uploaded PDFs
+* 🔎 Retrieval-Augmented Generation (RAG)
+* 🧠 Semantic document retrieval
+* 🔐 JWT-based authentication
+* 👤 User login and authentication
+* 🚪 Secure logout
+* 💬 Interactive chat interface
+* ⚡ React-based modern UI
+* 🔄 Spring Boot API gateway between frontend and AI service
+* 🗄️ H2 database for user information
+* 🧩 Modular backend architecture
+
+---
+
+## 🏗️ Architecture
 
 ```text
-                    ┌─────────────────────┐
-                    │    React Frontend   │
-                    │                     │
-                    │ PDF Upload + Chat   │
-                    └──────────┬──────────┘
+                    ┌──────────────────────┐
+                    │      React + Vite    │
+                    │      Frontend        │
+                    │                      │
+                    │  Login               │
+                    │  PDF Upload          │
+                    │  Chat Interface      │
+                    └──────────┬───────────┘
                                │
-                               │ HTTP Request
-                               ▼
-                    ┌─────────────────────┐
-                    │   Spring Boot       │
-                    │      Backend        │
-                    │                     │
-                    │ REST API Gateway    │
-                    └──────────┬──────────┘
-                               │
-                               │ HTTP Request
-                               ▼
-                    ┌─────────────────────┐
-                    │      FastAPI        │
-                    │     AI Service      │
-                    └──────────┬──────────┘
+                               │ HTTP
                                │
                                ▼
-                    ┌─────────────────────┐
-                    │     RAG Pipeline    │
-                    │                     │
-                    │ PDF Extraction      │
-                    │ Text Cleaning       │
-                    │ Text Chunking       │
-                    │ Embeddings          │
-                    │ FAISS Retrieval     │
-                    └──────────┬──────────┘
+                    ┌──────────────────────┐
+                    │     Spring Boot      │
+                    │      Backend         │
+                    │                      │
+                    │ JWT Authentication   │
+                    │ User Management      │
+                    │ API Gateway          │
+                    │ H2 Database          │
+                    └──────────┬───────────┘
+                               │
+                               │ HTTP
                                │
                                ▼
-                    ┌─────────────────────┐
-                    │      Groq LLM       │
-                    │                     │
-                    │ Answer Generation   │
-                    └─────────────────────┘
-````
+                    ┌──────────────────────┐
+                    │       FastAPI        │
+                    │       Python         │
+                    │                      │
+                    │ PDF Processing       │
+                    │ Text Chunking        │
+                    │ Embeddings           │
+                    │ Vector Retrieval     │
+                    │ RAG Question Answer  │
+                    └──────────────────────┘
+```
 
----
+### Request Flow
 
-##  RAG Pipeline
+For authentication:
 
-The application follows these steps:
+```text
+React
+  ↓
+POST /auth/login
+  ↓
+Spring Boot
+  ↓
+Validate user
+  ↓
+Generate JWT
+  ↓
+React stores JWT
+```
 
-### 1. PDF Upload
-
-The user uploads a PDF through the React frontend.
+For PDF upload:
 
 ```text
 React
@@ -87,112 +97,138 @@ POST /upload-pdf
 Spring Boot
   ↓
 FastAPI
+  ↓
+PDF processing
+  ↓
+Text chunks / embeddings
 ```
 
-### 2. PDF Processing
-
-FastAPI extracts the text from the uploaded PDF and cleans the extracted content.
-
-### 3. Text Chunking
-
-The document is divided into smaller chunks to make semantic retrieval more effective.
-
-### 4. Embedding Generation
-
-Each text chunk is converted into a vector representation using:
+For question answering:
 
 ```text
-BAAI/bge-small-en-v1.5
+React
+  ↓
+POST /query
+  ↓
+Spring Boot
+  ↓
+FastAPI
+  ↓
+Retrieve relevant PDF context
+  ↓
+Generate answer
+  ↓
+Spring Boot
+  ↓
+React
 ```
-
-### 5. FAISS Vector Store
-
-The generated embeddings are stored in a FAISS index.
-
-When a user asks a question, the question is also converted into an embedding and compared against the stored vectors.
-
-### 6. Similarity Search
-
-The top relevant chunks are retrieved from FAISS.
-
-### 7. LLM Generation
-
-The retrieved chunks are passed as context to the Groq LLM.
-
-The model generates an answer using only the retrieved PDF context.
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
-### Frontend
+## Frontend
 
 * React.js
+* Vite
 * Axios
-* HTML/CSS
+* JavaScript
+* CSS
 
-### Backend
+## Backend
 
 * Java
 * Spring Boot
-* Spring Web
-* RestClient
+* Spring Security
+* Spring Data JPA
+* Maven
+* JWT
+* H2 Database
 
-### AI Service
+## AI / RAG Backend
 
 * Python
 * FastAPI
-* Sentence Transformers
-* FAISS
-* Groq API
-
-### Machine Learning / NLP
-
-* BAAI/bge-small-en-v1.5
-* Semantic embeddings
-* Vector similarity search
-* Retrieval-Augmented Generation (RAG)
+* Uvicorn
+* PDF processing libraries
+* Sentence Transformers / embeddings
+* Vector search
+* Retrieval-Augmented Generation
 
 ---
 
-##  Project Structure
+# 📁 Project Structure
 
 ```text
 pdf-chat-app/
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ChatBox.jsx
-│   │   │   └── FileUpload.jsx
-│   │   └── ...
-│   └── package.json
 │
 ├── backend/
 │   │
 │   ├── python/
 │   │   ├── app.py
-│   │   ├── rag.py
-│   │   ├── utils.py
-│   │   ├── vector_store.py
-│   │   ├── llm.py
-│   │   └── requirements.txt
+│   │   ├── venv/
+│   │   └── ...
 │   │
 │   └── spring-backend/
-│       ├── src/
-│       │   └── main/
-│       │       ├── java/
-│       │       │   └── com/chanchal/rag_backend/
-│       │       │       ├── client/
-│       │       │       ├── config/
-│       │       │       ├── controller/
-│       │       │       ├── dto/
-│       │       │       └── service/
-│       │       └── resources/
-│       │           └── application.properties
-│       │
 │       ├── pom.xml
-│       └── mvnw
+│       │
+│       ├── src/
+│       │   ├── main/
+│       │   │   ├── java/
+│       │   │   │   └── com/
+│       │   │   │       └── chanchal/
+│       │   │   │           └── rag_backend/
+│       │   │   │               │
+│       │   │   │               ├── config/
+│       │   │   │               │   └── SecurityConfig.java
+│       │   │   │               │
+│       │   │   │               ├── controller/
+│       │   │   │               │   ├── AuthController.java
+│       │   │   │               │   └── HomeController.java
+│       │   │   │               │
+│       │   │   │               ├── dto/
+│       │   │   │               │   ├── LoginRequest.java
+│       │   │   │               │   ├── RegisterRequest.java
+│       │   │   │               │   ├── QueryRequest.java
+│       │   │   │               │   └── QueryResponse.java
+│       │   │   │               │
+│       │   │   │               ├── entity/
+│       │   │   │               │   └── User.java
+│       │   │   │               │
+│       │   │   │               ├── repository/
+│       │   │   │               │   └── UserRepository.java
+│       │   │   │               │
+│       │   │   │               ├── security/
+│       │   │   │               │   ├── JwtAuthenticationFilter.java
+│       │   │   │               │   └── JwtService.java
+│       │   │   │               │
+│       │   │   │               └── service/
+│       │   │   │                   ├── AuthService.java
+│       │   │   │                   ├── CustomUserDetailsService.java
+│       │   │   │                   └── QueryService.java
+│       │   │   │
+│       │   │   └── resources/
+│       │   │       └── application.properties
+│       │   │
+│       │   └── test/
+│       │
+│       └── ...
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Answer.jsx
+│   │   │   ├── ChatBox.jsx
+│   │   │   ├── FileUpload.jsx
+│   │   │   ├── Login.jsx
+│   │   │   └── Navbar.jsx
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── index.css
+│   │
+│   ├── package.json
+│   └── ...
 │
 ├── .gitignore
 └── README.md
@@ -200,11 +236,273 @@ pdf-chat-app/
 
 ---
 
-## 🔌 API Endpoints
+# 🔐 Authentication
 
-### Spring Boot Backend
+The application uses **JWT-based authentication** through Spring Security.
 
-#### Health Check
+### Authentication Flow
+
+1. User enters username and password.
+2. React sends credentials to Spring Boot.
+3. Spring Boot verifies the user against the H2 database.
+4. A JWT is generated after successful authentication.
+5. React stores the token in `localStorage`.
+6. Protected API requests include the token using:
+
+```text
+Authorization: Bearer <JWT_TOKEN>
+```
+
+7. `JwtAuthenticationFilter` validates the token.
+8. Spring Security allows the request to continue if authentication succeeds.
+
+---
+
+# 🔑 Environment Variables
+
+The JWT secret should **never be committed to GitHub**.
+
+The Spring Boot configuration uses:
+
+```properties
+jwt.secret=${JWT_SECRET}
+```
+
+Set the secret as an environment variable before starting Spring Boot.
+
+### Windows PowerShell
+
+```powershell
+$env:JWT_SECRET="your-new-secret-key"
+```
+
+Verify:
+
+```powershell
+echo $env:JWT_SECRET
+```
+
+Then start Spring Boot.
+
+> Do not put the actual JWT secret inside `application.properties` or commit it to GitHub.
+
+---
+
+# ⚙️ Prerequisites
+
+Make sure you have installed:
+
+* Java 17+
+* Maven or Maven Wrapper
+* Python 3.x
+* Node.js
+* npm
+* Git
+
+---
+
+# 🚀 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ChanchalRawate/rag-pdf-qa.git
+```
+
+Move into the project:
+
+```bash
+cd rag-pdf-qa
+```
+
+---
+
+# 🐍 Running the FastAPI Backend
+
+Open **Terminal 1**.
+
+Navigate to the Python backend:
+
+```powershell
+cd backend\python
+```
+
+Activate the virtual environment:
+
+```powershell
+.\venv\Scripts\activate
+```
+
+Start FastAPI:
+
+```powershell
+uvicorn app:app --reload --port 8000
+```
+
+You should see:
+
+```text
+Uvicorn running on http://127.0.0.1:8000
+```
+
+FastAPI documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+# ☕ Running the Spring Boot Backend
+
+Open **Terminal 2**.
+
+Navigate to the Spring Boot backend:
+
+```powershell
+cd backend\spring-backend
+```
+
+Set the JWT secret:
+
+```powershell
+$env:JWT_SECRET="your-new-secret-key"
+```
+
+Start Spring Boot:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+The backend will run on:
+
+```text
+http://localhost:8080
+```
+
+---
+
+# ⚛️ Running the React Frontend
+
+Open **Terminal 3**.
+
+Navigate to the frontend:
+
+```powershell
+cd frontend
+```
+
+Install dependencies:
+
+```powershell
+npm install
+```
+
+Start the development server:
+
+```powershell
+npm run dev
+```
+
+The frontend will be available at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# 🧪 Running the Complete Application
+
+For the complete application, run all three services.
+
+### Terminal 1 — FastAPI
+
+```powershell
+cd backend\python
+.\venv\Scripts\activate
+uvicorn app:app --reload --port 8000
+```
+
+### Terminal 2 — Spring Boot
+
+```powershell
+cd backend\spring-backend
+$env:JWT_SECRET="your-new-secret-key"
+.\mvnw.cmd spring-boot:run
+```
+
+### Terminal 3 — React
+
+```powershell
+cd frontend
+npm run dev
+```
+
+Then open:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# 📄 Using the Application
+
+## 1. Login
+
+Open the application and log in using your registered credentials.
+
+After successful authentication, the JWT token is stored in the browser.
+
+## 2. Upload a PDF
+
+Select a PDF using the **Upload Document** section.
+
+The PDF is sent through:
+
+```text
+React → Spring Boot → FastAPI
+```
+
+The FastAPI service processes the document and creates the required chunks/embeddings for retrieval.
+
+## 3. Ask Questions
+
+Enter a question such as:
+
+```text
+What is regularization?
+```
+
+The question follows:
+
+```text
+React
+ ↓
+Spring Boot
+ ↓
+FastAPI
+ ↓
+Retriever
+ ↓
+Relevant PDF context
+ ↓
+RAG generation
+ ↓
+Answer
+```
+
+The answer is then displayed in the chat interface.
+
+---
+
+# 🔌 API Endpoints
+
+## Spring Boot
+
+### Health Check
 
 ```http
 GET /
@@ -216,20 +514,40 @@ Response:
 Spring Boot Backend Running!
 ```
 
-#### Upload PDF
+### Login
+
+```http
+POST /auth/login
+```
+
+Request:
+
+```json
+{
+  "username": "your_username",
+  "password": "your_password"
+}
+```
+
+Response:
+
+```text
+JWT token
+```
+
+### PDF Upload
 
 ```http
 POST /upload-pdf
 ```
 
-Request:
+Form-data:
 
 ```text
-multipart/form-data
-pdf=<PDF file>
+pdf: <PDF file>
 ```
 
-#### Ask Question
+### Ask a Question
 
 ```http
 POST /query
@@ -243,222 +561,179 @@ Request:
 }
 ```
 
----
+Example response:
 
-## ⚙️ Local Setup
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/ChanchalRawate/rag-pdf-qa.git
-cd rag-pdf-qa
+```json
+{
+  "success": true,
+  "answer": "Regularization adds a penalty term to the loss function to discourage overly complex models and reduce overfitting."
+}
 ```
 
 ---
 
-### 2. Start FastAPI
+# 🧠 How RAG Works in This Project
 
-Navigate to:
-
-```bash
-cd backend/python
-```
-
-Create and activate the virtual environment:
-
-### Windows
-
-```powershell
-python -m venv venv
-venv\Scripts\activate
-```
-
-Install dependencies:
-
-```powershell
-pip install -r requirements.txt
-```
-
-Create a `.env` file:
-
-```env
-GROQ_API_KEY=your_groq_api_key
-```
-
-Start FastAPI:
-
-```powershell
-uvicorn app:app --reload
-```
-
-FastAPI will run on:
+The system follows the basic Retrieval-Augmented Generation pipeline:
 
 ```text
-http://127.0.0.1:8000
-```
-
----
-
-### 3. Start Spring Boot
-
-Open another terminal:
-
-```powershell
-cd backend/spring-backend
-```
-
-Run:
-
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
-Spring Boot will run on:
-
-```text
-http://localhost:8080
-```
-
----
-
-### 4. Start React
-
-Open another terminal:
-
-```powershell
-cd frontend
-```
-
-Install dependencies:
-
-```powershell
-npm install
-```
-
-Start the frontend:
-
-```powershell
-npm run dev
-```
-
----
-
-##  Environment Variables
-
-The Groq API key is stored locally in:
-
-```text
-backend/python/.env
-```
-
-Example:
-
-```env
-GROQ_API_KEY=your_api_key
-```
-
-The `.env` file is intentionally excluded from Git using `.gitignore`.
-
-**Never commit API keys or other secrets to GitHub.**
-
----
-
-##  Request Flow
-
-### PDF Upload
-
-```text
-User
+PDF
  ↓
-React FileUpload
- ↓
-Spring Boot /upload-pdf
- ↓
-FastAPI /upload-pdf
- ↓
-PDF Extraction
+Text Extraction
  ↓
 Text Chunking
  ↓
 Embeddings
  ↓
-FAISS Index
-```
-
-### Question Answering
-
-```text
+Vector Storage
+ ↓
 User Question
- ↓
-React ChatBox
- ↓
-Spring Boot /query
- ↓
-FastAPI /query
  ↓
 Question Embedding
  ↓
-FAISS Similarity Search
+Similarity Search
  ↓
-Top-K Relevant Chunks
+Relevant Context
  ↓
-Groq LLM
- ↓
-Generated Answer
- ↓
-React UI
+Answer Generation
 ```
+
+Instead of asking the language model to answer using only its pre-trained knowledge, the application retrieves relevant information from the uploaded PDF and uses that context to generate the response.
+
+This helps the system answer questions specifically based on the uploaded document.
 
 ---
 
-##  Example
+# 🗄️ Database
 
-Question:
+The Spring Boot backend uses **H2 Database** for user authentication data.
+
+Database configuration:
+
+```properties
+spring.datasource.url=jdbc:h2:file:./data/ragdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+```
+
+The H2 console is enabled at:
 
 ```text
-What is regularization, and how do L1 and L2 differ?
+http://localhost:8080/h2-console
 ```
 
-The system retrieves the most relevant chunks from the uploaded PDF and passes them to the LLM as context.
-
-The model generates an answer based only on the retrieved document content.
+The local database files are ignored by Git using `.gitignore`.
 
 ---
 
-## Project Highlights
+# 🛡️ Security
 
-* Implemented a complete Retrieval-Augmented Generation pipeline
-* Integrated React, Spring Boot, and FastAPI into a microservices-style architecture
-* Implemented semantic search using Sentence Transformer embeddings and FAISS
-* Integrated Groq LLM for context-aware answer generation
-* Designed Spring Boot as an API gateway between the frontend and AI service
-* Implemented multipart PDF upload and REST API communication
-* Added environment-based API key management
+The project follows basic security practices:
+
+* JWT authentication
+* Password-based user authentication
+* Protected API endpoints
+* JWT secret stored using an environment variable
+* Local database files excluded from Git
+* Python virtual environment excluded from Git
+* Node modules excluded from Git
+* Build artifacts excluded from Git
+
+Never commit:
+
+```text
+JWT secrets
+.env files
+Passwords
+Database files
+Uploaded PDFs
+Virtual environments
+node_modules
+target/
+```
 
 ---
 
-##  Future Improvements
+# 🧹 Git Ignore
 
-* Persistent vector database instead of in-memory FAISS storage
-* Support for multiple PDFs
-* User authentication
-* Conversation history
-* Streaming LLM responses
-* Improved chunking and retrieval strategies
-* Cloud deployment
-* Docker containerization
+The project ignores generated and sensitive files such as:
+
+```text
+node_modules/
+dist/
+venv/
+__pycache__/
+.env
+backend/spring-backend/target/
+backend/spring-backend/data/
+```
 
 ---
 
-## 👩‍💻 Author
+# 🔮 Future Improvements
+
+Possible future improvements include:
+
+* 📚 Support for multiple PDFs
+* 👤 User-specific document collections
+* 💾 Persistent vector database
+* 📝 Conversation history
+* 📌 Source citations for generated answers
+* 📊 Retrieval confidence scores
+* 🗑️ Delete uploaded documents
+* 🔄 Document re-indexing
+* 🌐 Production deployment
+* 🐳 Docker containerization
+* ☁️ Cloud deployment
+* 🔑 Refresh-token authentication
+* 🛡️ Improved password hashing and security policies
+
+---
+
+# 📌 Project Status
+
+### Current functionality
+
+*  React frontend
+*  PDF upload UI
+*  Chat interface
+*  FastAPI RAG backend
+*  Spring Boot backend gateway
+*  JWT authentication
+*  Login
+*  Logout
+*  H2 user database
+*  Protected API endpoints
+*  PDF question answering
+*  Local end-to-end pipeline
+
+---
+
+# 👩‍💻 Author
 
 **Chanchal Rawate**
 
+IIT (ISM) Dhanbad
+
 GitHub:
-[https://github.com/ChanchalRawate](https://github.com/ChanchalRawate)
+https://github.com/ChanchalRawate
 
+---
 
+# ⭐ Acknowledgements
 
+This project was developed as a practical implementation of:
 
+* Retrieval-Augmented Generation
+* Semantic Search
+* Natural Language Processing
+* REST APIs
+* Spring Security
+* JWT Authentication
+* React-based web applications
 
+---
 
+## ⭐ If you find this project useful
+
+Give the repository a ⭐ on GitHub and feel free to explore, improve, and extend the project.
