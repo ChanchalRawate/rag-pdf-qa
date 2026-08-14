@@ -1,4 +1,3 @@
-import "./Navbar.css";
 
 function NavBar() {
   const handleLogout = () => {
