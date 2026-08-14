@@ -21,16 +21,25 @@ function FileUpload({ file, setFile }) {
     formData.append("pdf", file);
 
     try {
+      const token = localStorage.getItem("token");
+
       const response = await axios.post(`${API}/upload-pdf`, formData, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
-      console.log(response.data);
+      console.log("Upload response:", response.data);
       alert("PDF uploaded successfully!");
     } catch (error) {
-      console.error(error);
+      console.error("Upload error:", error);
+
+      if (error.response) {
+        console.error("Status:", error.response.status);
+        console.error("Response:", error.response.data);
+      }
+
       alert("Upload failed.");
     }
   };

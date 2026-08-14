@@ -19,19 +19,35 @@ function ChatBox({ messages, setMessages }) {
       },
     ]);
 
-    // Clear the input box
+    // Clear input
     setQuestion("");
 
     try {
       console.log("Sending question:", userQuestion);
 
-      // Send question to Node.js backend
-      const response = await axios.post("http://localhost:8080/query", {
-        question: userQuestion,
-      });
+      // Get JWT token
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      // Send question to Spring Boot backend
+      const response = await axios.post(
+        "http://localhost:8080/query",
+        {
+          question: userQuestion,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
       console.log("Response:", response.data);
 
-      // Show bot's response
+      // Show bot response
       setMessages((prev) => [
         ...prev,
         {
@@ -42,7 +58,11 @@ function ChatBox({ messages, setMessages }) {
     } catch (error) {
       console.error("AXIOS ERROR:", error);
 
-      // Show error message if server fails
+      if (error.response) {
+        console.error("Status:", error.response.status);
+        console.error("Response:", error.response.data);
+      }
+
       setMessages((prev) => [
         ...prev,
         {

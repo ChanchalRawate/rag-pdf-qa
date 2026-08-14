@@ -36,3 +36,10 @@ backend/uploads/
 
 backend/python/uploads/*
 !backend/python/uploads/.gitkeep
+
+# Spring Boot / Maven
+backend/spring-backend/target/
+
+# Local H2 database
+backend/spring-backend/data/
+
