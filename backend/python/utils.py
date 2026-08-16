@@ -3,9 +3,6 @@ from PyPDF2 import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
-# ======================================================
-# Load PDF
-# ======================================================
 
 def load_pdf(pdf_path):
 
@@ -23,9 +20,7 @@ def load_pdf(pdf_path):
     return text
 
 
-# ======================================================
-# Clean Text
-# ======================================================
+
 
 def clean_text(text):
 
@@ -36,9 +31,6 @@ def clean_text(text):
     return text.strip()
 
 
-# ======================================================
-# Chunk Text
-# ======================================================
 
 def chunk_text(text):
 
