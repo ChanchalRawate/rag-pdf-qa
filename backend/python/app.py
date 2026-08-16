@@ -7,9 +7,6 @@ from rag import process_pdf, ask_question
 print(">>> rag imported")
 app = FastAPI()
 print(">>> FastAPI created")
-# -----------------------------------
-# Enable CORS
-# -----------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,23 +16,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -----------------------------------
-# Upload Folder
-# -----------------------------------
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# -----------------------------------
-# Request Models
-# -----------------------------------
+
 
 class QueryRequest(BaseModel):
     question: str
 
-# -----------------------------------
-# Routes
-# -----------------------------------
+
 
 @app.get("/")
 def home():
@@ -43,9 +33,7 @@ def home():
         "message": "Python RAG API Running"
     }
 
-# -----------------------------------
-# Upload PDF
-# -----------------------------------
+
 
 @app.post("/upload-pdf")
 async def upload_pdf(pdf: UploadFile = File(...)):
@@ -71,9 +59,7 @@ async def upload_pdf(pdf: UploadFile = File(...)):
             "error": str(e),
         }
 
-# -----------------------------------
-# Ask Question
-# -----------------------------------
+
 
 @app.post("/query")
 def query_pdf(request: QueryRequest):
